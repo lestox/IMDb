@@ -1,0 +1,17 @@
+{
+  "name": "melissande/app",
+  "autoload": {
+    "psr-4": {
+      "App\\": "src/"
+    }
+  },
+  "authors": [
+    {
+      "name": "Mélissande Dizy",
+      "email": "melissandedizy@gmail.com"
+    }
+  ],
+  "require": {
+    "firebase/php-jwt": "^6.1"
+  }
+}

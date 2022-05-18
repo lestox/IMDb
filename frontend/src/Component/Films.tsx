@@ -1,13 +1,17 @@
 import {FilmsInterface} from "../Interface/ResponsesInterfaces";
-import Films from "./Films";
 
-export default function BlogList({filmsList}: { filmsList: FilmsInterface[] }) {
+export default function Films({films}: { films: FilmsInterface }) {
     return (
-        <div className='p-5'>
-            <h1 className='text-center mb-5'>Tous les films</h1>
-            {filmsList.map((blog: FilmsInterface) => (
-                <Films films={films} key={films.id}/>
-            ))}
+        <div className='bg-light rounded p-3 mb-3'>
+            <h3>{films.title}</h3>
+            <p>
+                <small>
+                    Par : {films.author}
+                    <br/>
+                    Le : {films.date}
+                </small>
+            </p>
+            <p>{films.content}</p>
         </div>
     )
 }

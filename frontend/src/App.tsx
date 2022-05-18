@@ -1,77 +1,83 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import {useEffect, useState} from "react";
-import axios from "axios";
+import useLogin from "./Hook/useLogin";
+import {FilmsInterface, LoginResponseInterface} from "./Interface/ResponsesInterfaces";
+import {LocalUserInterface} from "./Interface/LocalUserInterface";
+import useGetFilmsList from "./Hook/useGetFilmsList";
+
+import FilmsList from "./Component/FilmsList";
+import useEraseCookie from "./Hook/UseEraseCookie";
+import useRegister from "./Hook/UseRegister";
+import useGetCookies from "./Hook/UseGetCookie";
 
 export default function App() {
-  const [loggedUser, setLoggedUser] = useState<LoginResponseInterface>({
-    status: 'error',
-    token: "",
-    username: ""
-  })
-  const [localUser, setLocalUser] = useState<LocalUserInterface>({password: "", username: ""})
-  const [blogList, setBlogList] = useState<BlogInterface[]>([])
-  // Determines if the user wants to LogIn or to Register
-  const [needsLogin, setNeedsLogin] = useState<boolean>(true)
-  const [needsUpdate, setNeedsUpdate] = useState<boolean>(false)
+    const [loggedUser, setLoggedUser] = useState<LoginResponseInterface>({
+        status: 'error',
+        token: "",
+        username: ""
+    })
+    const [localUser, setLocalUser] = useState<LocalUserInterface>({password: "", username: ""})
+    const [filmsList, setFilmsList] = useState<FilmsInterface[]>([])
+    // Determines if the user wants to LogIn or to Register
+    const [needsLogin, setNeedsLogin] = useState<boolean>(true)
+    const [needsUpdate, setNeedsUpdate] = useState<boolean>(false)
 
-  const login = useLogin();
-  const register = useRegister();
-  const getBlogList = useGetBlogList();
-  const cookies = useGetCookies();
-  const eraseCookie = useEraseCookie();
+    const login = useLogin();
+    const register = useRegister();
+    const getFilmsList = useGetFilmsList();
+    const cookies = useGetCookies();
+    const eraseCookie = useEraseCookie();
 
-  useEffect(() => {
-    if (Object.keys(cookies).includes('hetic_token') && Object.keys(cookies).includes('hetic_username')) {
-      console.log('got cookies !', loggedUser)
-      setLoggedUser(prev => ({
-        ...prev,
-        username: cookies.hetic_username,
-        token: cookies.hetic_token
-      }))
+    useEffect(() => {
+        if (Object.keys(cookies).includes('imdb_token') && Object.keys(cookies).includes('imdb_username')) {
+            console.log('got cookies !', loggedUser)
+            setLoggedUser(prev => ({
+                ...prev,
+                username: cookies.imdb_username,
+                token: cookies.imdb_token
+            }))
+        }
+    }, [])
+
+    useEffect(() => {
+        if (needsLogin && localUser.username !== '') {
+            console.log('login ?')
+            login(localUser.username, localUser.password)
+                .then(data => setLoggedUser(data))
+        } else if (!needsLogin && localUser.username !== '') {
+            console.log('register ?', localUser.username)
+            register(localUser.username, localUser.password)
+                .then(data => setLoggedUser(data))
+        }
+    }, [localUser])
+
+    useEffect(() => {
+        getFilmsList()
+            .then(data => {
+                setFilmsList(data)
+                setNeedsUpdate(false)
+            })
+    }, [needsUpdate])
+
+    const handleDisconnect = () => {
+        setLoggedUser({
+            status: 'error',
+            token: "",
+            username: ""
+        });
+        eraseCookie();
     }
-  }, [])
 
   useEffect(() => {
-    if (needsLogin && localUser.username !== '') {
-      console.log('login ?')
-      login(localUser.username, localUser.password)
-          .then(data => setLoggedUser(data))
-    } else if (!needsLogin && localUser.username !== '') {
-      console.log('register ?', localUser.username)
-      register(localUser.username, localUser.password)
-          .then(data => setLoggedUser(data))
-    }
-  }, [localUser])
-
-  useEffect(() => {
-    getBlogList()
+    getFilmsList()
         .then(data => {
-          setBlogList(data)
-          setNeedsUpdate(false)
+          setFilmsList(data)
         })
-  }, [needsUpdate])
-
-  const handleDisconnect = () => {
-    setLoggedUser({
-      status: 'error',
-      token: "",
-      username: ""
-    });
-    eraseCookie();
-  }
+  }, [])
 
   return (
       <div className='container mt-5'>
-        <HideIfLogged loggedUser={loggedUser}>
-          <LoginForm setLocalUser={setLocalUser} needsLogin={needsLogin} setNeedsLogin={setNeedsLogin}/>
-        </HideIfLogged>
-
-        <HideIfNotLogged loggedUser={loggedUser}>
-          <button className='btn btn-danger d-block mx-auto mb-3' onClick={handleDisconnect}>Disconnect</button>
-          <BlogForm loggedUser={loggedUser} setNeedsUpdate={setNeedsUpdate}/>
-        </HideIfNotLogged>
-
-        <BlogList blogList={blogList}/>
+        <FilmsList filmsList={filmsList}/>
       </div>
   )
 }
