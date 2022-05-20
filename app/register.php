@@ -1,6 +1,5 @@
 <?php
 
-require_once './vendor/autoload.php';
 require_once 'headers.php';
 require_once 'Classes/PDOFactory.php';
 require_once 'Classes/TokenHelper.php';

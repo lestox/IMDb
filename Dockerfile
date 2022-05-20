@@ -7,6 +7,9 @@ FROM php:8.1.2-apache
 RUN docker-php-ext-install mysqli pdo pdo_mysql \
     && a2enmod rewrite
 
+# Install Composer
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+
 #RUN apt-get update -y
 #RUN apt-get install libyaml-dev -y
 #RUN pecl install yaml && echo "extension=yaml.so" > /usr/local/etc/php/conf.d/ext-yaml.ini && docker-php-ext-enable yaml

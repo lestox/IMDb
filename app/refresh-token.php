@@ -1,6 +1,5 @@
 <?php
 
-require_once './vendor/autoload.php';
 require_once 'Classes/TokenHelper.php';
 require_once 'headers.php';
 require_once 'Classes/User.php';
@@ -9,6 +8,7 @@ require_once 'Classes/CookieHelper.php';
 $token = $_COOKIE['imdb_token'] ?? '';
 
 try {
+    $appSecret = 'unSuperSecret!';
     $oldJwt = \Firebase\JWT\JWT::decode($token, new \Firebase\JWT\Key($appSecret, 'HS256'));
 
     $user = (new User())

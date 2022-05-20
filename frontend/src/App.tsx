@@ -9,6 +9,10 @@ import FilmsList from "./Component/FilmsList";
 import useEraseCookie from "./Hook/UseEraseCookie";
 import useRegister from "./Hook/UseRegister";
 import useGetCookies from "./Hook/UseGetCookie";
+import LoginForm from "./Component/LoginForm";
+import HideIfLogged from "./Component/HideIfLogged";
+import HideIfNotLogged from "./Component/HideIfNotLogged";
+import Header from "./Component/Header";
 
 export default function App() {
     const [loggedUser, setLoggedUser] = useState<LoginResponseInterface>({
@@ -76,8 +80,17 @@ export default function App() {
   }, [])
 
   return (
+      // <Header></Header>
       <div className='container mt-5'>
-        <FilmsList filmsList={filmsList}/>
+          <HideIfLogged loggedUser={loggedUser}>
+              <LoginForm setLocalUser={setLocalUser} needsLogin={needsLogin} setNeedsLogin={setNeedsLogin}/>
+          </HideIfLogged>
+
+          <HideIfNotLogged loggedUser={loggedUser}>
+              <button className='btn btn-danger d-block mx-auto mb-3' onClick={handleDisconnect}>Disconnect</button>
+          </HideIfNotLogged>
+
+          <FilmsList filmsList={filmsList}/>
       </div>
   )
 }
